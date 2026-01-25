@@ -17,6 +17,7 @@ spec:
       containers:
       - name: ms-temperature
         image: ms-temperature:1.0.0
+        args: [ "--random", "http://ms-random:8080" ]
         ports:
         - containerPort: 8080
 ---

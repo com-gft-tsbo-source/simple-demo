@@ -12,10 +12,19 @@ httpd = None
 def shutdown_handler(signum, frame):
     if httpd:
         print(f"Received signal {signum}, shutting down HTTP server", flush=True)
+        sys.stdout.flush()
         httpd.socket.close()
     sys.exit(0)
        
 class Handler(BaseHTTPRequestHandler):
+
+    def log_message(self, format, *args):
+        sys.stderr.write("%s - - [%s] %s\n" %
+                         (self.address_string(),
+                          self.log_date_time_string(),
+                          format % args))
+        sys.stderr.flush()
+
     def _json_response(self, payload, status=200):
         body = json.dumps(payload).encode("utf-8")
         self.send_response(status)
@@ -80,6 +89,7 @@ def main():
     host = os.environ['HOSTNAME'] if 'HOSTNAME' in os.environ else '***'
 
     print(f"This is '{name}' at version '{version}', listening on port '{args.port}' on '{host}'.")
+    sys.stdout.flush()
 
     httpd = HTTPServer(("", args.port), Handler)
     httpd.name = name

@@ -17,6 +17,9 @@ spec:
       containers:
       - name: ms-random
         image: ms-random:1.0.0
+        env:
+          - name: "VERSION"
+            value: "1.0.0"
         ports:
         - containerPort: 8080
 ---
