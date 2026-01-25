@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Temperature Dashboard</title>
+  <style>
+    .fixed-font {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+                   "Liberation Mono", "Courier New", monospace;
+    }
+
+    .temperature-square {
+      width: 400px;
+      border: 1px solid #333;
+      padding: 16px;
+      font-family: sans-serif;
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    .temperature-value {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-align: right;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    td {
+      padding: 2px 4px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    td.name {
+      font-weight: bold;
+      white-space: nowrap;
+      padding-right: 8px;
+      text-align: left;
+    }
+    td.host {
+      font-weight: normal;
+      white-space: nowrap;
+      padding-right: 8px;
+      text-align: right;
+    }
+    td.version {
+      font-weight: bold;
+      white-space: nowrap;
+      padding-right: 8px;
+      text-align: right;
+    }
+    .version-ok {
+      color: inherit;
+    }
+
+    .version-bad {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="temperature-square">
+    <div class="temperature-value" id="temperature">--°C</div>
+
+    <table>
+      <tr>
+        <td class="name"   id="temp-service-name">ms-temperautre</td>
+        <td class="host fixed-font"    id="temp-service-host">--</td>
+        <td class="version fixed-font" id="temp-service-version">--</td>
+      </tr>
+      <tr>
+        <td class="name"   id="random-service-name">ms-random</td>
+        <td class="host fixed-font"    id="random-service-host">--</td>
+        <td class="version fixed-font" id="random-service-version">--</td>
+      </tr>
+    </table>
+  </div>
+
+  <script>
+    const msTemperatureUrl = "http://localhost:8081/temperature";
+    const pollingInterval = 1000; // ms
+    const EXPECTED_VERSION = "v1.0.0";
+
+    function setVersion(element, version) {
+      element.textContent = version;
+      element.classList.remove("version-ok", "version-bad");
+
+      if (version === EXPECTED_VERSION) {
+        element.classList.add("version-ok");
+      } else {
+        element.classList.add("version-bad");
+      }
+    }
+    const el_temperature = document.getElementById("temperature")
+    const el_temp_service_name = document.getElementById("temp-service-name")
+    const el_temp_service_host = document.getElementById("temp-service-host")
+    const el_temp_service_version = document.getElementById("temp-service-version")
+    const el_random_service_name = document.getElementById("random-service-name")
+    const el_random_service_host = document.getElementById("random-service-host")
+    const el_random_service_version = document.getElementById("random-service-version")
+
+    async function pollTemperature() {
+      try {
+        const res = await fetch(msTemperatureUrl);
+        if (!res.ok) throw new Error("HTTP error");
+
+        const data = await res.json();
+
+        el_temperature.textContent = data.temperature + "°C";
+        el_temp_service_name.textContent = `${data.name}`;
+        el_temp_service_host.textContent = `${data.host}`;
+	setVersion(el_temp_service_version, `v${data.version}`);
+        el_random_service_name.textContent = `${data.randomService.name}`;
+        el_random_service_host.textContent = `${data.randomService.host}`;
+	setVersion(el_random_service_version, `v${data.randomService.version}`);
+      } catch (err) {
+        console.error("Failed to fetch temperature:", err);
+        el_temperature.textContent = "--°C";
+        el_temp_service_name.textContent = "--";
+        el_temp_service_host.textContent = "--";
+        el_temp_service_version.textContent = "--";
+        el_random_service_name.textContent = "--";
+        el_random_service_host.textContent = "--";
+        el_random_service_version.textContent = "--";
+      }
+    }
+
+    pollTemperature();
+    setInterval(pollTemperature, pollingInterval);
+  </script>
+</body>
+</html>
+

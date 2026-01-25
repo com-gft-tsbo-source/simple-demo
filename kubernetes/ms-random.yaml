@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-random
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-random
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: ms-random
+        version: 1.0.0
+    spec:
+      containers:
+      - name: ms-random
+        image: ms-random:1.0.0
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-random
+spec:
+  selector:
+    app: ms-random
+    version: 1.0.0
+  ports:
+  - port: 8080

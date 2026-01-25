@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-temperature
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ms-temperature
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: ms-temperature
+        version: 1.0.0
+    spec:
+      containers:
+      - name: ms-temperature
+        image: ms-temperature:1.0.0
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-temperature
+spec:
+  selector:
+    app: ms-temperature
+    version: 1.0.0
+  ports:
+  - port: 8080

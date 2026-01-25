@@ -1,0 +1,29 @@
+services:
+
+  ms-random:
+    image: ms-random:1.0.0
+    container_name: ms-random
+    ports:
+      - "8082:8080"
+    command: ["--version", "2.0.0", "--port", "8080"]
+    restart: always
+
+  ms-temperature:
+    image: ms-temperature:1.0.0
+    container_name: ms-temperature
+    ports:
+      - "8081:8080"
+    command: ["--version", "1.0.0", "--port", "8080", "--random", "http://ms-random:8080"]
+    depends_on:
+      - ms-random
+    restart: always
+
+  frontend:
+    image: frontend:1.0.0
+    container_name: temperature-frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ms-temperature
+    restart: always
+
