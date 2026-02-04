@@ -84,8 +84,11 @@
     </table>
   </div>
 
+  <script src="config.js"></script>
   <script>
-    const msTemperatureUrl = "http://localhost:8081/temperature";
+    const msTemperatureUrl = (window.RUNTIME_CONFIG && window.RUNTIME_CONFIG.TARGET)
+      ? window.RUNTIME_CONFIG.TARGET
+      : "http://localhost:8081/temperature";
     const pollingInterval = 1000; // ms
     const EXPECTED_VERSION = "v1.0.0";
 
@@ -138,4 +141,3 @@
   </script>
 </body>
 </html>
-
